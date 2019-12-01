@@ -31,9 +31,9 @@ public class JdbcTester implements CommandLineRunner {
 
         final boolean active = testMysqlDatabase(host, database, user, password, query);
         if (active) {
-            LOG.info("SUCCESS");
+            LOG.info("{}/{} - SUCCESS", host, database);
         } else {
-            LOG.error("FAILURE");
+            LOG.error("{}/{} - FAILURE", host, database);
         }
     }
 
@@ -43,6 +43,11 @@ public class JdbcTester implements CommandLineRunner {
         dataSource.setPassword(password);
         dataSource.setServerName(host);
         dataSource.setDatabaseName(database);
+        try {
+            dataSource.setServerTimezone("UTC");
+        } catch (SQLException e) {
+            LOG.warn("Can't set server timezone to UTC");
+        }
 
         try(Connection conn = dataSource.getConnection();
                 Statement stmt = conn.createStatement();) {
